@@ -17,78 +17,62 @@
         <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.css">
         <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.js"></script>
 
-        <!-- <script type="text/javascript" src="../summernote-image-plugin.js"></script> -->
-        <!-- <script type="text/javascript" src="../summernote-fontawesome.js"></script> -->
-
-        <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&libraries=places"></script>
-        <script type="text/javascript" src="../summernote-map-plugin.js"></script>
 
         <style type="text/css">
-            /*
-                http://stackoverflow.com/questions/10957781/google-maps-autocomplete-result-in-bootstrap-modal-dialog
-             .pac-container {
-                background-color: #FFF;
-                z-index: 20;
-                position: fixed;
-                display: inline-block;
-                float: left;
-            }*/
+        /* http://stackoverflow.com/questions/10957781/google-maps-autocomplete-result-in-bootstrap-modal-dialog */
+        .modal{
+            height: 100%;
+            z-index: 20;
+        }
 
-            .modal{
-                height: 100%;
-                z-index: 20;
-            }
+        .modal-backdrop{
+            z-index: 10;
+        }​
 
-            .modal-backdrop{
-                z-index: 10;
-            }​
-
-            html, body {
-                height: 100%;
-                margin: 0;
-                padding: 0;
-              }
-
-            #map {
-                height: 300px;
-          }
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
         </style>
-        <script type="text/javascript">
-            $(document).ready(function() {
-                $('#summernote').summernote({
-                    lang: 'en-EN',
-                    imageTitle: {
-                      specificAltField: true,
-                    },
-                    toolbar: [
-                        ['style', ['bold', 'italic', 'underline', 'clear']],
-                        ['fontsize', ['fontsize']],
-                        ['color', ['color']],
-                        ['para', ['ul', 'ol', 'paragraph']],
-                        ['insert', ['link', 'picture', 'map', 'table', 'fontIcon']]
-                    ],
-                    popover: {
-                        image: [
-                            ['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
-                            ['float', ['floatLeft', 'floatRight', 'floatNone']],
-                            ['remove', ['removeMedia']]
-                            // ['custom', ['imageTitle']],
-                        ],
-                    },
-                });
-            });
 
+        <script type="text/javascript">
+        $(document).ready(function() {
+            $('#summernote').summernote({
+                // focus: true,
+                lang: 'en-EN',
+                gmapConfig: {
+                    apiKey: 'AIzaSyALCBm4cAMf44UnLGIPDQzsZPp7pFTSnE0',
+                    mapType: 'embed', // static or embed
+                },
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['fontsize', ['fontsize']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['insert', ['link', 'picture', 'map', 'table']]
+                ],
+                popover: {
+                    image: [
+                        ['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
+                        ['float', ['floatLeft', 'floatRight', 'floatNone']],
+                        ['remove', ['removeMedia']]
+                    ]
+                }
+            });
+        });
         </script>
     </head>
     <body>
-
         <div class="container">
-            <h1>Example for Summernote-Map-Plugin</h1>
+            <h1>Example for summernote-map-plugin</h1>
             <br />
             <div id="summernote">
-                <!-- <img src="http://lorempixel.com/400/200/" alt=""> -->
+                <p>Hello, Summernote</p>
             </div>
         </div>
-
+        
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyALCBm4cAMf44UnLGIPDQzsZPp7pFTSnE0&libraries=places"></script>
+        <script type="text/javascript" src="../summernote-map-plugin.js"></script>
     </body>
 </html>

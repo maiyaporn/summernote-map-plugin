@@ -24,24 +24,22 @@
         }
     });
 
-    // Extends plugins for adding hello.
-    //  - plugin is external module for customizing.
+    $.extend($.summernote.options, {
+        gmapConfig: {
+          apiKey: ''
+        }
+    });
 
-    // map options - map size
-    //                        - autocomplete filter
-    //                        - static map/iframe
+    // Extends plugins for adding map insertion functionality
     $.extend($.summernote.plugins, {
         /**
          * @param {Object} context - context object has status of editor.
          */
         'map': function(context) {
             var self = this;
-
             var ui = $.summernote.ui;
-            var $note = context.layoutInfo.note;
-            var $editor = context.layoutInfo.editor;
-            var $editable = context.layoutInfo.editable;
 
+            var $editor = context.layoutInfo.editor;
             var options = context.options;
             var lang = options.langInfo;
 
@@ -58,44 +56,28 @@
             });
 
             // This events will be attached when editor is initialized.
-              this.events = {
+            this.events = {
                 // This will be called after modules are initialized.
                 'summernote.init': function (we, e) {
-                  console.log('summernote initialized', we, e);
-                  console.log(self.$dialog);
-                },
-                // This will be called when user releases a key on editable.
-                'summernote.keyup': function (we, e) {
-                  console.log('summernote keyup', we, e);
+                  self.initMapDialog();
                 }
-              };
+            };
 
-            this.initialize = function() {
-                console.log('initialize');
-                var $container = options.dialogsInBody ? $(document.body) : $editor;
+            this.insertMapDialog = {
+                title: 'Add a location',
+                body: '<div id="placeField" class="form-group">' + 
+                       '<label>' + 'Name or Address' + '</label>' +
+                       '<input id="input-autocomplete" class="form-control" type="text" placeholder="Enter a place" />' +
+                      '</div>' +
+                      '<div id="map-in-dialog" style="height: 300px;"></div>',
+                footer: '<button href="#" id="btn-insert-map" class="btn btn-primary">' + 'Add' + '</button>',
+                closeOnEscape: true
+            };
 
-                var body = '<div id="placeField" class="form-group">' +
-                    '<label>' + 'Name or Address' + '</label>' +
-                    '<input id="autocomplete" class="form-control" type="text" placeholder="Enter a place" />' +
-                    '</div>' +
-                    '<div id="map"></div>';
-
-                var footer = '<button href="#" class="btn btn-primary btn-add-map">' + 'Add' + '</button>';
-
-                self.$dialog = ui.dialog({
-                    title: 'Add a location',
-                    body: body,
-                    footer: footer,
-                    closeOnEscape: true
-                }).render().appendTo($container);
-
-
-                var mapDiv = self.$dialog.find('#map')[0];
-                var mapOptions = {
-
-                };
-
-                var map = new google.maps.Map(mapDiv, {
+            this.initMapDialog = function() {
+                console.log('initMapDialog');
+                var mapContainer = self.$dialog.find('#map-in-dialog')[0];
+                var map = new google.maps.Map(mapContainer, {
                     center: {
                         lat: -33.8688,
                         lng: 151.2195
@@ -103,8 +85,7 @@
                     zoom: 13
                 });
 
-                var input = self.$dialog.find('#autocomplete')[0];
-
+                var input = self.$dialog.find('#input-autocomplete')[0];
                 var autocomplete = new google.maps.places.Autocomplete(input);
                 autocomplete.bindTo('bounds', map);
 
@@ -115,8 +96,8 @@
 
                 google.maps.event.addListener(autocomplete, 'place_changed', function() {
                     marker.setVisible(false);
+
                     var place = autocomplete.getPlace();
-                    console.log(place);
                     if (!place.geometry) {
                         window.alert("Autocomplete's returned place contains no geometry");
                         return;
@@ -129,6 +110,7 @@
                         map.setCenter(place.geometry.location);
                         map.setZoom(13); // Why 17? Because it looks good.
                     }
+
                     marker.setIcon( /** @type {google.maps.Icon} */ ({
                         url: place.icon,
                         size: new google.maps.Size(71, 71),
@@ -136,10 +118,15 @@
                         anchor: new google.maps.Point(17, 34),
                         scaledSize: new google.maps.Size(35, 35)
                     }));
+
                     marker.setPosition(place.geometry.location);
                     marker.setVisible(true);
-
                 });
+            };
+
+            this.initialize = function() {
+                var $container = options.dialogsInBody ? $(document.body) : $editor;
+                self.$dialog = ui.dialog(this.insertMapDialog).render().appendTo($container);
             };
 
             this.destroy = function() {
@@ -156,37 +143,31 @@
             };
 
             this.show = function() {
-                console.log('show');
-                var $img = $($editable.data('target'));
-                var imgInfo = {
-                };
-
-                this.showMapDialog(imgInfo).then(function(imgInfo) {
-                    console.log('show -- showMapDialog');
-                    console.log(self.$dialog.find('#autocomplete'));
-
+                this.showInsertMapDialog().then(function(imgInfo) {
+                    var input = self.$dialog.find('#input-autocomplete')[0];
+                    var place = input.value;
                     ui.hideDialog(self.$dialog);
+                    input.value = "";
 
                     var iframe = document.createElement('iframe');
                     iframe.width = "400";
                     iframe.height = "300";
-                    iframe.src = "https://www.google.com/maps/embed/v1/place?key=API_KEY&q=Eiffel+Tower,Paris+France"
+                    iframe.src = "https://www.google.com/maps/embed/v1/place?key=" + options.gmapConfig.apiKey + "&q=" + place;
                     context.invoke('editor.insertNode', iframe);
                 });
             };
 
-            this.showMapDialog = function(imgInfo) {
-                console.log('showMapDialog');
+            this.showInsertMapDialog = function() {
                 return $.Deferred(function(deferred) {
-                    $addBtn = self.$dialog.find('.btn-add-map');
+
+                    $addBtn = self.$dialog.find('#btn-insert-map');
 
                     ui.onDialogShown(self.$dialog, function() {
                         context.triggerEvent('dialog.shown');
 
                         $addBtn.click(function(event) {
                             event.preventDefault();
-                            deferred.resolve({
-                            });
+                            deferred.resolve();
                         });
 
                     });
