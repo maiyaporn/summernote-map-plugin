@@ -19,16 +19,6 @@
 
 
         <style type="text/css">
-        /* http://stackoverflow.com/questions/10957781/google-maps-autocomplete-result-in-bootstrap-modal-dialog */
-        .modal{
-            height: 100%;
-            z-index: 20;
-        }
-
-        .modal-backdrop{
-            z-index: 10;
-        }​
-
         html, body {
             height: 100%;
             margin: 0;
@@ -41,9 +31,9 @@
             $('#summernote').summernote({
                 // focus: true,
                 lang: 'en-EN',
-                gmapConfig: {
+                map: {
                     apiKey: 'AIzaSyALCBm4cAMf44UnLGIPDQzsZPp7pFTSnE0',
-                    mapType: 'embed', // static or embed
+                    zoom: 13
                 },
                 toolbar: [
                     ['style', ['bold', 'italic', 'underline', 'clear']],
@@ -65,14 +55,14 @@
     </head>
     <body>
         <div class="container">
-            <h1>Example for summernote-map-plugin</h1>
+            <!-- <h1>Example for summernote-map-plugin</h1> -->
             <br />
             <div id="summernote">
                 <p>Hello, Summernote</p>
             </div>
         </div>
-        
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyALCBm4cAMf44UnLGIPDQzsZPp7pFTSnE0&libraries=places"></script>
+
+<!--         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyALCBm4cAMf44UnLGIPDQzsZPp7pFTSnE0&libraries=places"></script> -->
         <script type="text/javascript" src="../summernote-map-plugin.js"></script>
     </body>
 </html>

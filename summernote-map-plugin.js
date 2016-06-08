@@ -11,82 +11,119 @@
         factory(window.jQuery);
     }
 }(function($) {
+
     $.extend(true, $.summernote.lang, {
         'en-US': {
             mapButton: {
                 tooltip: "Map"
+            },
+            mapDialog: {
+                title: "Add a location"
             }
         },
         'th-TH': {
             mapButton: {
                 tooltip: "แผนที่"
+            },
+            mapDialog: {
+                title: "เพิ่มแผนที่"
             }
         }
     });
 
-    $.extend($.summernote.options, {
-        gmapConfig: {
-          apiKey: ''
-        }
-    });
+    var mapOption = {
+        apiKey: '', // google maps api browser key
+        center: {
+             lat: -33.8688,
+             lng: 151.2195
+        },
+        zoom: 13
+    };
 
-    // Extends plugins for adding map insertion functionality
+    // Extends plugins for map insertion
     $.extend($.summernote.plugins, {
         /**
          * @param {Object} context - context object has status of editor.
          */
         'map': function(context) {
+
             var self = this;
             var ui = $.summernote.ui;
-
             var $editor = context.layoutInfo.editor;
             var options = context.options;
             var lang = options.langInfo;
+
+            // Set default options for map
+           options.map = $.extend(mapOption, options.map);
+
+            const GOOGLE_MAPS_API_URL = ("http://maps.google.com/maps/api/js?key=API_KEY&libraries=places").replace("API_KEY", options.map.apiKey);
+            const EMBED_URL = ("https://www.google.com/maps/embed/v1/place?key=API_KEY&q=PLACE").replace("API_KEY", options.map.apiKey);
 
             context.memo('button.map', function() {
                 var button = ui.button({
                     contents: "<i class='fa fa-map-o'/>",
                     tooltip: lang.mapButton.tooltip,
                     click: function(e) {
-                        context.invoke('map.show');
+                        self.show();
                     }
                 });
 
                 return button.render();
             });
 
+            /**
+             * Create a dialog for adding map and append to container
+             */
+            this.initialize = function() {
+                var addMapDialog = {
+                    title: lang.mapDialog.title,
+                    body: '<div class="form-group">' +
+                                  '<label>' + 'Name or Address' + '</label>' +
+                                  '<input id="input-autocomplete" class="form-control" type="text" placeholder="Enter a place" />' +
+                               '</div>' +
+                               '<div id="map-in-dialog" style="height: 300px;"></div>',
+                    footer: '<button href="#" id="btn-add" class="btn btn-primary">' + 'Add' + '</button>' +
+                                '<button href="#" id="btn-cancel" class="btn btn-primary">' + 'Cancel' + '</button>',
+                    closeOnEscape: true
+                };
+
+                var $container = options.dialogsInBody ? $(document.body) : $editor;
+                self.$dialog = ui.dialog(addMapDialog).render().appendTo($container);
+
+                $('.modal').css({
+                    "z-index": "20",
+                    "height": "100%"
+                });
+            };
+
+            this.destroy = function() {
+                ui.hideDialog(this.$dialog);
+                self.$dialog.remove();
+            };
+
             // This events will be attached when editor is initialized.
             this.events = {
                 // This will be called after modules are initialized.
                 'summernote.init': function (we, e) {
-                  self.initMapDialog();
+                    if( typeof google == 'object' && typeof google.maps == 'object' ) {
+                        self.initMapDialog();
+                    } else {
+                        $.getScript( GOOGLE_MAPS_API_URL, self.initMapDialog);
+                    }
                 }
-            };
-
-            this.insertMapDialog = {
-                title: 'Add a location',
-                body: '<div id="placeField" class="form-group">' + 
-                       '<label>' + 'Name or Address' + '</label>' +
-                       '<input id="input-autocomplete" class="form-control" type="text" placeholder="Enter a place" />' +
-                      '</div>' +
-                      '<div id="map-in-dialog" style="height: 300px;"></div>',
-                footer: '<button href="#" id="btn-insert-map" class="btn btn-primary">' + 'Add' + '</button>',
-                closeOnEscape: true
             };
 
             this.initMapDialog = function() {
                 console.log('initMapDialog');
-                var mapContainer = self.$dialog.find('#map-in-dialog')[0];
-                var map = new google.maps.Map(mapContainer, {
-                    center: {
-                        lat: -33.8688,
-                        lng: 151.2195
-                    },
-                    zoom: 13
+                var mapDiv = self.$dialog.find('#map-in-dialog')[0];
+                var map = new google.maps.Map(mapDiv, {
+                    center: options.map.center,
+                    zoom: options.map.zoom
                 });
 
-                var input = self.$dialog.find('#input-autocomplete')[0];
-                var autocomplete = new google.maps.places.Autocomplete(input);
+                var autocompleteInput = self.$dialog.find('#input-autocomplete')[0];
+                var autocomplete = new google.maps.places.Autocomplete(autocompleteInput);
+
                 autocomplete.bindTo('bounds', map);
 
                 var marker = new google.maps.Marker({
@@ -99,7 +136,7 @@
 
                     var place = autocomplete.getPlace();
                     if (!place.geometry) {
-                        window.alert("Autocomplete's returned place contains no geometry");
+                        console.log("Autocomplete's returned place contains no geometry");
                         return;
                     }
 
@@ -108,7 +145,7 @@
                         map.fitBounds(place.geometry.viewport);
                     } else {
                         map.setCenter(place.geometry.location);
-                        map.setZoom(13); // Why 17? Because it looks good.
+                        map.setZoom(options.map.zoom);
                     }
 
                     marker.setIcon( /** @type {google.maps.Icon} */ ({
@@ -122,47 +159,72 @@
                     marker.setPosition(place.geometry.location);
                     marker.setVisible(true);
                 });
-            };
 
-            this.initialize = function() {
-                var $container = options.dialogsInBody ? $(document.body) : $editor;
-                self.$dialog = ui.dialog(this.insertMapDialog).render().appendTo($container);
-            };
-
-            this.destroy = function() {
-                ui.hideDialog(this.$dialog);
-                self.$dialog.remove();
-            };
-
-            this.bindEnterKey = function($input, $btn) {
-                $input.on('keypress', function(event) {
-                    if (event.keyCode === 13) {
-                        $btn.trigger('click');
-                    }
-                });
+                // google.maps.event.addListener(map, 'idle', function() {
+                //     google.maps.event.trigger(map, 'resize');
+                // });
             };
 
             this.show = function() {
-                this.showInsertMapDialog().then(function(imgInfo) {
-                    var input = self.$dialog.find('#input-autocomplete')[0];
-                    var place = input.value;
-                    ui.hideDialog(self.$dialog);
-                    input.value = "";
+                context.invoke('editor.saveRange');
 
-                    var iframe = document.createElement('iframe');
-                    iframe.width = "400";
-                    iframe.height = "300";
-                    iframe.src = "https://www.google.com/maps/embed/v1/place?key=" + options.gmapConfig.apiKey + "&q=" + place;
-                    context.invoke('editor.insertNode', iframe);
-                });
+                this.showAddMapDialog()
+                    .then(function() {
+                        context.invoke('editor.restoreRange');
+                        var input = self.$dialog.find('#input-autocomplete')[0];
+
+                        self.insertEmbedMapToEditor(input.value);
+                        ui.hideDialog(self.$dialog);
+                        input.value = "";
+                    }).fail(function() {
+                        context.invoke('editor.restoreRange');
+                    });
             };
 
-            this.showInsertMapDialog = function() {
+            this.insertEmbedMapToEditor = function(placeName) {
+                var $div = $('<div>');
+                $div.css({
+                    'position': 'relative',
+                    'padding-top': '25px',
+                    'padding-bottom': '56.25%',
+                    'height': '0',
+                    'overflow': 'hidden',
+                    'text-align': 'center'
+                });
+
+                var $iframe = $('<iframe>', {
+                    src: EMBED_URL.replace("PLACE", placeName),
+                    height: '250px'
+                });
+
+                $iframe.css({
+                    'position': 'absolute',
+                    'top': '0',
+                    'left': '0',
+                    'width': '100% !important',
+                    'height': '100% !important',
+                    'margin': '0 auto'
+                });
+
+                console.log($iframe)
+
+                $div.html($iframe)
+                // var iframe = document.createElement('iframe');
+                // iframe.width = "400";
+                // iframe.height = "300";
+                // iframe.src = EMBED_URL.replace("PLACE", placeName);
+
+                context.invoke('editor.insertNode',  $div[0]);
+            };
+
+            this.showAddMapDialog = function() {
                 return $.Deferred(function(deferred) {
 
-                    $addBtn = self.$dialog.find('#btn-insert-map');
+                    $addBtn = self.$dialog.find('#btn-add');
 
                     ui.onDialogShown(self.$dialog, function() {
+                        // http://stackoverflow.com/questions/10957781/google-maps-autocomplete-result-in-bootstrap-modal-dialog
+                        $('.modal-backdrop').css("z-index", 10);
                         context.triggerEvent('dialog.shown');
 
                         $addBtn.click(function(event) {
