@@ -4,6 +4,8 @@ This is a plugin for adding map to [Summernote WYSIWYG] editor. It allows users 
 
 ## Demo
 
+<a href="http://maiyaporn.github.io/summernote-map-plugin/" target="_blank">Summernote-map-plugin</a>
+
 
 ## Installation
 
