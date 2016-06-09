@@ -33,7 +33,6 @@ Note:
 
 To enable map button in toolbar, you need to add 'map' in toolbar options when initialize summernote. Also, you can provide your apiKey along with other config for the map.
 
-    ```html
     <script type="text/javascript">
       $('#summernote').summernote({
         map: {
@@ -50,7 +49,7 @@ To enable map button in toolbar, you need to add 'map' in toolbar options when i
         ]
       });
   </script>
-  ```
+
 
 ## Improvement
  - Responsive iframe of embed map
