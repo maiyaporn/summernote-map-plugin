@@ -68,15 +68,19 @@
             var dialogOption = {
                 title: lang.mapDialog.title,
                 body: '<div class="form-group">' +
-                    '<label>' + 'Name or Address' + '</label>' +
-                    '<input id="input-autocomplete" class="form-control" type="text" placeholder="Enter a place" />' +
+                    '<label>' + lang.mapDialog.label + '</label>' +
+                    '<input id="input-autocomplete" class="form-control" type="text" placeholder="' + lang.mapDialog.placeholder + '" />' +
                     '</div>' +
                     '<div id="map-in-dialog" style="height: 300px;"></div>',
-                footer: '<button href="#" id="btn-add" class="btn btn-primary">' + 'Add' + '</button>',
+                footer: '<button href="#" id="btn-add" class="btn btn-primary">' + lang.mapDialog.button + '</button>',
                 closeOnEscape: true
             };
 
             self.$dialog = ui.dialog(dialogOption).render().appendTo($container);
+            self.$dialog.css({
+                "z-index": "20",
+                "height": "100%"
+            });
             self.$addBtn = self.$dialog.find('#btn-add');
             self.$mapInput = self.$dialog.find('#input-autocomplete')[0];
             self.$mapContainer = self.$dialog.find('#map-in-dialog')[0];
@@ -212,11 +216,6 @@
         this.initialize = function() {
             var $container = options.dialogsInBody ? $(document.body) : $editor;
             self.createMapDialog($container);
-
-            $('.modal').css({
-                "z-index": "20",
-                "height": "100%"
-            });
         };
 
         this.destroy = function() {
@@ -237,28 +236,34 @@
         };
     };
 
-    $.extend(true, $.summernote.lang, {
-        'en-US': {
-            mapButton: {
-                tooltip: "Map"
+    $.extend(true, $.summernote, {
+        lang: {
+            'en-US': {
+                mapButton: {
+                    tooltip: "Map"
+                },
+                mapDialog: {
+                    title: "Insert Map",
+                    label: "Place name or Address",
+                    placeholder: "e.g. Eiffel Tower",
+                    button: "Insert Map"
+                }
             },
-            mapDialog: {
-                title: "Add a location"
+            'th-TH': {
+                mapButton: {
+                    tooltip: "แผนที่"
+                },
+                mapDialog: {
+                    title: "แทรกแผนที่",
+                    label: "ชื่อสถานที่หรือที่อยู่",
+                    placeholder: "e.g. Eiffel Tower",
+                    button: "แทรกแผนที่"
+                }
             }
         },
-        'th-TH': {
-            mapButton: {
-                tooltip: "แผนที่"
-            },
-            mapDialog: {
-                title: "เพิ่มแผนที่"
-            }
+        plugins: {
+            'map': mapPlugin
         }
-    });
-
-    // Extends plugins for map insertion
-    $.extend($.summernote.plugins, {
-        'map': mapPlugin
     });
 
 }));
