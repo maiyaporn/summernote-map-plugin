@@ -13,25 +13,27 @@
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
 
-        <!-- include summernote css/js-->
+        <!-- include summernote css/js -->
         <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.css">
         <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.js"></script>
 
-        <!-- include summernote plugin-->
-        <script type="text/javascript" src="summernote-map-plugin.js"></script>
+        <!-- include summernote map plugin -->
+         <script type="text/javascript" src="summernote-map-plugin.js"></script>
+
 
         <style type="text/css">
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
         </style>
 
         <script type="text/javascript">
         $(document).ready(function() {
             $('#summernote').summernote({
-                // focus: true,
+                height: 150,
+                focus: true,
                 lang: 'en-EN',
                 map: {
                     apiKey: 'AIzaSyALCBm4cAMf44UnLGIPDQzsZPp7pFTSnE0',
@@ -43,26 +45,20 @@
                     ['color', ['color']],
                     ['para', ['ul', 'ol', 'paragraph']],
                     ['insert', ['link', 'picture', 'map', 'table']]
-                ],
-                popover: {
-                    image: [
-                        ['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
-                        ['float', ['floatLeft', 'floatRight', 'floatNone']],
-                        ['remove', ['removeMedia']]
-                    ]
-                }
+                ]
             });
         });
         </script>
     </head>
     <body>
         <div class="container">
-            <h1>Example for summernote-map-plugin</h1>
-            <br />
+            <h1>summernote-map-plugin</h1>
+            <br/>
+
+            <p>Click the map button to search for a place and add to the editor.</p>
             <div id="summernote">
                 <p>Hello, Summernote</p>
             </div>
         </div>
-
     </body>
 </html>
