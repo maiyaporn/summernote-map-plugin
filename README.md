@@ -9,7 +9,7 @@ This is a plugin for adding map to [Summernote WYSIWYG] editor. It allows users 
 
 ## Installation
 
-1. Include a plugin script along with Summernote
+Include a plugin script along with Summernote
 
     ```html
     <!-- include jquery -->
@@ -50,8 +50,4 @@ To enable map button in toolbar, you need to add 'map' in toolbar options when i
             ['insert',  'map']]
         ]
       });
-  </script>
-
-
-## Improvement
- - Responsive iframe of embed map
+    </script>
