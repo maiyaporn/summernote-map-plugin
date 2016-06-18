@@ -51,5 +51,3 @@ To enable map button in toolbar, you need to add 'map' in toolbar options when i
       });
     </script>
 
-## License
-MIT
