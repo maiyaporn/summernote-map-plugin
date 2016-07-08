@@ -11,7 +11,6 @@ This is a plugin for adding map to [Summernote WYSIWYG] editor. It allows users 
 
 Include a plugin script along with Summernote
 
-    ```html
     <!-- include jquery -->
     <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
 
@@ -26,7 +25,7 @@ Include a plugin script along with Summernote
 
     <!-- include summernote plugin-->
     <script type="text/javascript" src="summernote-map-plugin.js"></script>
-    ```
+
 
 Note:
   If google maps api is not already in your application, the plugin will load the script automatically with your apiKey.
@@ -51,3 +50,4 @@ To enable map button in toolbar, you need to add 'map' in toolbar options when i
         ]
       });
     </script>
+
