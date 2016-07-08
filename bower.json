@@ -1,0 +1,10 @@
+{
+  "name": "summernote-map-plugin",
+  "main": "summernote-map-plugin.js",
+  "homepage": "https://github.com/maiyaporn/summernote-map-plugin",
+  "authors": [
+    "maiyaporn <p.maiyaporn@gmail.com>"
+  ],
+  "description": "A plugin for adding map to Summernote WYSIWYG editor.",
+  "license": "MIT"
+}
